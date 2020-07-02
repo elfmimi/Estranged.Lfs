@@ -43,6 +43,7 @@ namespace Estranged.Lfs.Adapter.S3
         public Task<SignedBlob> UriForUpload(string oid, long size)
         {
             GetPreSignedUrlRequest request = MakePreSignedUrl(oid, HttpVerb.PUT, BlobConstants.UploadMimeType);
+            request.Headers["x-amz-acl"] = "bucket-owner-full-control";
             string signed = client.GetPreSignedURL(request);
 
             return Task.FromResult(new SignedBlob
@@ -51,9 +52,11 @@ namespace Estranged.Lfs.Adapter.S3
                 Expiry = config.Expiry,
                 Headers = new Dictionary<string, string>
                 {
-                    {"Content-Type", BlobConstants.UploadMimeType}
+                    {"Content-Type", BlobConstants.UploadMimeType},
+                    {"x-amz-acl", "bucket-owner-full-control"}
                 }
             });
         }
     }
 }
+
